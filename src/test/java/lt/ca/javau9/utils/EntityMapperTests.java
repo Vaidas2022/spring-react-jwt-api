@@ -1,4 +1,4 @@
-package lt.ca.javau9;
+package lt.ca.javau9.utils;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
