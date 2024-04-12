@@ -24,11 +24,21 @@ import javax.crypto.SecretKey;
 public class JwtUtils {
   private static final Logger logger = LoggerFactory.getLogger(JwtUtils.class);
 
-  @Value("${bezkoder.app.jwtSecret}")
+  @Value("${javau9.app.jwtSecret}")
   private String jwtSecret;
 
-  @Value("${bezkoder.app.jwtExpirationMs}")
+  @Value("${javau9.app.jwtExpirationMs}")
   private int jwtExpirationMs;
+  
+  
+  public void setSecretKey(String key) {
+	  jwtSecret = key;
+  }
+  
+  public void setExpirationMs(int ms) {
+	  jwtExpirationMs = ms;
+  }
+  
 
   public String generateJwtToken(Authentication authentication) {
 
@@ -42,8 +52,12 @@ public class JwtUtils {
         .compact();
   }
   
+  public Key toKey(String secret) {
+	  return Keys.hmacShaKeyFor(Decoders.BASE64.decode(secret));
+  }
+  
   private Key key() {
-    return Keys.hmacShaKeyFor(Decoders.BASE64.decode(jwtSecret));
+    return toKey(jwtSecret);
   }
 
   public String getUserNameFromJwtToken(String token) {
