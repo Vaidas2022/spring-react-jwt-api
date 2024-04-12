@@ -1,4 +1,4 @@
-package lt.ca.javau9;
+package lt.ca.javau9.controllers;
 
 import java.util.List;
 import java.util.Optional;

@@ -3,6 +3,9 @@ package lt.ca.javau9.services;
 import java.util.List;
 import java.util.Optional;
 
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
 import lt.ca.javau9.models.UserDto;
@@ -11,7 +14,7 @@ import lt.ca.javau9.repositories.UserRepository;
 import lt.ca.javau9.utils.EntityMapper;
 
 @Service
-public class UserService {
+public class UserService implements UserDetailsService  {
 
 	private final UserRepository userRepository;
 	private final EntityMapper entityMapper;
@@ -62,6 +65,16 @@ public class UserService {
 	
 	public void deleteUser(Long id) {
 		userRepository.deleteById(id);
+	}
+
+	@Override
+	public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
+		UserEntity user = userRepository
+							.findByUsername(username)
+							.orElseThrow(() -> new UsernameNotFoundException("User Not Found with username: " + username));
+		
+		
+		return entityMapper.toUserDto(user);
 	}
 	
 }

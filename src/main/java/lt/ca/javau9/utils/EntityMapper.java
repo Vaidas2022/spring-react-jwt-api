@@ -14,7 +14,7 @@ public class EntityMapper {
 		entity.setId( dto.getId());
 		entity.setUsername( dto.getUsername());
 		entity.setEmail(dto.getEmail());
-				
+		entity.setPassword(dto.getPassword());	
 		return entity;		
 	}
 	
