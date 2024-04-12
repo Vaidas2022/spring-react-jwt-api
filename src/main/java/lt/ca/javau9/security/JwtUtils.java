@@ -62,8 +62,13 @@ public class JwtUtils {
 
   public String getUserNameFromJwtToken(String token) {
 	  
-	  return Jwts.parser().verifyWith((SecretKey) key()).build()
-               .parseSignedClaims(token).getPayload().getSubject();
+	  return Jwts
+			  .parser()
+			  .verifyWith((SecretKey) key())
+			  .build()
+              .parseSignedClaims(token)
+              .getPayload()
+              .getSubject();
   }
 
   public boolean validateJwtToken(String authToken) {

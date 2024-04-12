@@ -2,8 +2,11 @@ package lt.ca.javau9.models;
 
 import java.util.Collection;
 import java.util.Objects;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -16,7 +19,7 @@ public class UserDto implements UserDetails {
 	private String username;
 	private String email;
 	
-	private Collection<? extends GrantedAuthority> authorities;
+	private Set<Role> roles;
 	
 	@JsonIgnore
 	private String password; //One way road 
@@ -29,19 +32,21 @@ public class UserDto implements UserDetails {
 		this.email = email;
 	}
 	
-	public UserDto(String username, String email, String password) {
-		this.username = username;
-		this.email = email;
-		this.password = password;
-	}
-	
-	
-	public UserDto(Long id, String username, String email, String password, Collection<? extends GrantedAuthority> authorities) {
+	public UserDto(Long id, String username, String email, String password, Set<Role> roles) {
 		this.id = id;
 		this.username = username;
 		this.email = email;
 		this.password = password;
-		this.authorities = authorities;
+		this.roles = roles;
+	}
+	
+	
+	
+
+	public UserDto(String username, String email, String password) {
+		this.username = username;
+		this.email = email;
+		this.password = password;
 	}
 
 	public Long getId() {
@@ -79,7 +84,9 @@ public class UserDto implements UserDetails {
 	@Override
 	public Collection<? extends GrantedAuthority> getAuthorities() {
 		
-		 return authorities;
+		 return roles.stream()
+	                .map(role -> new SimpleGrantedAuthority(role.getName()))
+	                .collect(Collectors.toSet());
 	}
 
 	@Override
@@ -111,4 +118,12 @@ public class UserDto implements UserDetails {
 	    UserDto user = (UserDto) o;
 	    return Objects.equals(id, user.id);
 	  }
+
+	@Override
+	public String toString() {
+		return "UserDto [id=" + id + ", username=" + username + ", email=" + email + ", roles=" + roles
+				+ ", password=" + password + "]";
+	}
+	  
+	  
 }

@@ -46,6 +46,7 @@ public class JwtUtilsTest {
         UserDto user = new UserDto("user1", "user1@example.com", "pass");
         when(authentication.getPrincipal()).thenReturn(user);
 
+        //Act
         String token = jwtUtils.generateJwtToken(authentication);
         assertNotNull(token);
         assertTrue(token.split("\\.").length == 3); // JWT structure check
