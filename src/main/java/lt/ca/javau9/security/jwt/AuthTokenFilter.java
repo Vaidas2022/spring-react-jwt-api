@@ -6,6 +6,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -29,33 +30,22 @@ public class AuthTokenFilter extends OncePerRequestFilter {
 	 
 	 private static final Logger logger = LoggerFactory.getLogger(AuthTokenFilter.class);
 	
-	@Override
-	protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
-			throws ServletException, IOException {
-		
-		try {
-		      String jwt = parseJwt(request);
-		      if (jwt != null && jwtUtils.validateJwtToken(jwt)) {
-		        String username = jwtUtils.getUserNameFromJwtToken(jwt);
-
-		        UserDetails userDetails = userService.loadUserByUsername(username);
-		        UsernamePasswordAuthenticationToken authentication =
-		            new UsernamePasswordAuthenticationToken(
-		                userDetails,
-		                null,
-		                userDetails.getAuthorities());
-		        authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
-
-		        SecurityContextHolder.getContext().setAuthentication(authentication);
-		      }
-		    } catch (Exception e) {
-		      logger.error("Cannot set user authentication: {}", e);
-		    }
-
-		    filterChain.doFilter(request, response);
-		
-		
-	}
+	 @Override
+	 protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
+	         throws ServletException, IOException {
+	     String jwt = parseJwt(request);
+	     if (jwt != null && jwtUtils.validateJwtToken(jwt)) {
+	         Authentication authentication = jwtUtils.getAuthentication(jwt);
+	         if (authentication != null) {
+	             SecurityContextHolder.getContext().setAuthentication(authentication);
+	             logger.debug("Authentication set: " + SecurityContextHolder.getContext().getAuthentication());
+	         } else {
+	             logger.debug("Authentication is null, not setting SecurityContext");
+	         }
+	     }
+	     filterChain.doFilter(request, response);
+	 }
+	 
 	
 	private String parseJwt(HttpServletRequest request) {
 	    String headerAuth = request.getHeader("Authorization");
