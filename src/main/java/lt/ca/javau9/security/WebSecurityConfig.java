@@ -55,21 +55,20 @@ public class WebSecurityConfig {
 	  }
 	 
 	 @Bean
-	 SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
-	    http.csrf(csrf -> csrf.disable())
-	        .exceptionHandling(exception -> exception.authenticationEntryPoint(unauthorizedHandler))
-	        .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-	        .authorizeHttpRequests(auth -> 
-			          auth.requestMatchers("/api/auth/**").permitAll()
-			              .requestMatchers("/api/test/**").permitAll()
-			              .anyRequest().authenticated()
-	        );
-	    
-	    http.authenticationProvider(authenticationProvider());
+	 public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+	     http.csrf(csrf -> csrf.disable())
+	         .authorizeHttpRequests(auth -> 
+	             auth.requestMatchers("/api/auth/**").permitAll()
+	                 .requestMatchers("/api/users").hasRole("ADMIN")
+	                 .anyRequest().authenticated()
+	         )
+	         .exceptionHandling(exception -> exception.authenticationEntryPoint(unauthorizedHandler))
+	         .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
 
-	    http.addFilterBefore(authenticationJwtTokenFilter(), UsernamePasswordAuthenticationFilter.class);
-	    
-	    return http.build();
-	  }
+	     http.authenticationProvider(authenticationProvider());
+	     http.addFilterBefore(authenticationJwtTokenFilter(), UsernamePasswordAuthenticationFilter.class);
+
+	     return http.build();
+	 }
 	 
 }

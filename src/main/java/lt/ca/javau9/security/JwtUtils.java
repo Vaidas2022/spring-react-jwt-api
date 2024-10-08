@@ -7,13 +7,17 @@ import io.jsonwebtoken.UnsupportedJwtException;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
 import lt.ca.javau9.models.UserDto;
+import lt.ca.javau9.services.UserService;
 
 import java.security.Key;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
 
 import java.util.Date;
@@ -23,6 +27,9 @@ import javax.crypto.SecretKey;
 @Component
 public class JwtUtils {
   private static final Logger logger = LoggerFactory.getLogger(JwtUtils.class);
+  
+  @Autowired
+  UserService userService;
 
   @Value("${javau9.app.jwtSecret}")
   private String jwtSecret;
@@ -73,7 +80,9 @@ public class JwtUtils {
 
   public boolean validateJwtToken(String authToken) {
     try {
+    	logger.debug("trying to validate jwt token");
       Jwts.parser().verifyWith((SecretKey)key()).build().parse(authToken);
+        logger.debug("jwt token is valid \n" + authToken);
       return true;
     } catch (MalformedJwtException e) {
       logger.error("Invalid JWT token: {}", e.getMessage());
@@ -87,4 +96,11 @@ public class JwtUtils {
 
     return false;
   }
+  
+  public Authentication getAuthentication(String token) {
+	    String username = getUserNameFromJwtToken(token);
+	    UserDetails userDetails = userService.loadUserByUsername(username);
+	    return new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
+	}
+  
 }
