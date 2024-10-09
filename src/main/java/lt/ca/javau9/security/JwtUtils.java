@@ -98,6 +98,8 @@ public class JwtUtils {
   }
   
   public Authentication getAuthentication(String token) {
+	  logger.trace("Suveike metodas getAuthentication");
+	  
 	    String username = getUserNameFromJwtToken(token);
 	    UserDetails userDetails = userService.loadUserByUsername(username);
 	    logger.debug("UserDetails loaded: " + userDetails.getUsername() + ", Roles: " + userDetails.getAuthorities());

@@ -29,5 +29,9 @@ public class DbSeeder implements CommandLineRunner {
             roleRepository.save(new Role(ERole.ROLE_USER));
             logger.info("ROLE_USER added.");
         }
+        if (roleRepository.findByName(ERole.ROLE_MODERATOR).isEmpty()) {
+            roleRepository.save(new Role(ERole.ROLE_MODERATOR));
+            logger.info("ROLE_MODERATOR added.");
+        }
     }
 }
